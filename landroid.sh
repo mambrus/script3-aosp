@@ -13,7 +13,6 @@ function landroid() {
     cat ~/.landroid  | egrep '^/' | tail -n1
 }
 
-set -e
 source s3.ebasename.sh
 if [ "$LANDROID_SH" == $( ebasename $0 ) ]; then
 	#Not sourced, do something with this.
