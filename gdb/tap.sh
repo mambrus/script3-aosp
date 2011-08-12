@@ -7,14 +7,6 @@ if [ -z $TAP_SH ]; then
 
 TAP_SH="tap.sh"
 
-# This script works as the basename command, except that it also
-# ripps away everything in the name before the next but last '.'
-# I.e. usage like:
-# $ tap /some/path/pre.fix.myshell.sh
-#   myshell.sh
-#
-# The script is a core part of the 'script3' script library
-
 function tap() {
 	exec tcp_tap "$@"
 }
