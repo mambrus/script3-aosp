@@ -23,8 +23,8 @@ source s3.ebasename.sh
 if [ "$TAP_SH" == $( ebasename $0 ) ]; then
 	#Not sourced, do something with this.
 
-	export TCP_TAP_EXEC="$(which arm-eabi-gdb)"
-	#export TCP_TAP_EXEC="$(which gdb71)"
+	#export TCP_TAP_EXEC="$(which arm-eabi-gdb)"
+	export TCP_TAP_EXEC="$(which gdb_arm)"
 	export TCP_TAP_PORT="6969"
 
 	#Remove the remarks below to disable logging
