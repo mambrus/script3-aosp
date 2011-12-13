@@ -14,9 +14,18 @@ function attach() {
 	local PORT=$2
 	local PID=$(adb shell ps | grep $PNAME | sed -e 's/^[[:alnum:]_]\+[[:space:]]\+//; s/[[:space:]]\+.*$//')
 
-	echo "Attaching $PNAME at PID=$PID using TCP port: $PORT "
+	if [ "x${PID}" == "x" ]; then
+		echo "No process [$PNAME] on running target. exiting" 1>&2
+		exit 1
+	else
+		echo "Attaching $PNAME at PID=$PID using TCP port: $PORT "
+	fi
 
-	adb root; adb remount; adb forward "tcp:$PORT" "tcp:$PORT"; adb shell "gdbserver :$PORT --attach $PID"
+	#adb root; adb remount;
+	adb forward "tcp:$PORT" "tcp:$PORT";
+	
+	#adb shell "gdbserver :$PORT --attach $PID"
+	adb shell "semc_gdbserver :$PORT --attach $PID"
 }
 
 source s3.ebasename.sh
