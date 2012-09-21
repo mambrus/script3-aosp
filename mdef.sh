@@ -50,6 +50,8 @@ AWK1='
 # No right hand value on same line. Add +1 to line number
 AWK2='
 	/^\./{
+		#printf("\n####\n")
+		printf("\n")
 		if (match($0,"=[[:space:]]\\\\[[:space:]]*$")){
 			print $1";"$2 + 1";"$3
 		} else {
@@ -80,8 +82,12 @@ function mdef() {
 			awk -F";" "${AWK2}" | \
 			awk "${AWK3}" | \
 			sed -e 's/\\//g' | \
-			sed -e 's/[[:space:]]\+/ /g'
-		#echo
+			sed -e 's/[[:space:]]\+/ /g' | \
+			sed -e 's/[[:space:]]\+$//' | \
+			awk '/[[:graph:]]/{print $0}'
+
+#sed -ne '/[[:graph:]]/p'
+#			sed -e '/^[[:space:]]*$/d' 
 	done
 }
 
