@@ -74,6 +74,7 @@ BUILD_SH="build.sh"
 
 function build() {
 	make "$@"
+	echo "fake"
 }
 
 
@@ -92,7 +93,7 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 		exit 1
 	fi
 
-	if [ -z AOSP_BUILD_SURPRESS_FULL ]; then
+	if [ -z ${AOSP_BUILD_SURPRESS_FULL} ]; then
 		AOSP_BUILD_SURPRESS_FULL="no"
 	fi
 
@@ -100,7 +101,8 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 
 	TS=$(date '+%y%m%d_%H%M%S')
 	GRCAT_FILE="$( ebasename $0 )_${TS}"
-	ARTIFACT_DIR="build_artifacts/$(hostname)_${TS}"
+	ABN=${TARGET_PRODUCT}_$(hostname)_${TS}
+	ARTIFACT_DIR="build_artifacts/${ABN}"
 	NPROPS=$(grep processor /proc/cpuinfo | wc -l)
 	NJ=$(( NPROPS + (NPROPS/2) ))
 
@@ -145,14 +147,16 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 		echo "Storing symbols..."
 		cd "${ANDROID_PRODUCT_OUT}"
 		tar -cf ${ANDROID_BUILD_TOP}/${ARTIFACT_DIR}/symbols.tar symbols
-		mkdir -p ${ANDROID_BUILD_TOP}/images
+		mkdir -p ${ANDROID_BUILD_TOP}/${ARTIFACT_DIR}/images
 		echo "Storing flashable images..."
-		cp -dp * ${ANDROID_BUILD_TOP}/images
+		set +e
+		cp -dp * ${ANDROID_BUILD_TOP}/${ARTIFACT_DIR}/images 2>/dev/null
+		set -e
 	)
 	(
-		echo "Compressing into filename build_artifacts/$(hostname)_${TS}.tar.gz..."
+		echo "Compressing into filename build_artifacts/${ABN}.tar.gz..."
 		cd build_artifacts
-		tar -czf $(hostname)_${TS}.tar.gz $(hostname)_${TS}/
+		tar -czf ${ABN}.tar.gz ${ABN}/ && echo "All done!"
 	)
 
 	exit $?
