@@ -6,12 +6,14 @@
 #
 # Features:
 # =========
-# * Produce colorized output if possible (requires grcat installed)
-# * Makes a static manifes so that each build can be exacly reproduced
+# * Produce colorized output if possible (requires grcat installed to
+#     colorize but is tolerant not to require it)
+# * Makes a static manifest snapshot so that each build can be exactly 
+#     reproduced from source)
 # * Figures out the best -j make-flag for your host.
-# *  Yet: Accepts all make arguments that Android build system would normally
-#    do
-# * Stores build articats in separate directory for each build occation
+# *  Yet: Accepts all make arguments that Android build system would
+#    normally accept.
+# * Stores build artifacts in separate directory for each build occasion
 # * build-artifacts consists of the following:
 #   * build-log
 #   * manifest.xml
@@ -88,6 +90,10 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 	if [ "X${ARM_EABI_TOOLCHAIN}" == "X" ] || [ ! -d ${ARM_EABI_TOOLCHAIN} ]; then
 		echo "Error: Did you 'source build/envsetup.sh'?" 1>&2
 		exit 1
+	fi
+
+	if [ -z AOSP_BUILD_SURPRESS_FULL ]; then
+		AOSP_BUILD_SURPRESS_FULL="no"
 	fi
 
 	set -u
