@@ -157,7 +157,7 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 		cd build_artifacts
 		tar -czf ${ABN}.tar.gz ${ABN}/ 
 	)
-	echo "Cleaning up..."
+	echo "Cleaning up [build_artifacts/${ABN}]..."
 	rm -rf build_artifacts/${ABN}
 	echo "All done!"
 
