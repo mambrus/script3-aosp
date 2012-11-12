@@ -96,6 +96,11 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 		AOSP_BUILD_SURPRESS_FULL="no"
 	fi
 
+	ls .repo/manifest.xml || (
+		echo "Error: You're not standing in an Android root directory" 1>&2
+		exit 3
+	)
+
 	set -u
 
 	TS=$(date '+%y%m%d_%H%M%S')
@@ -145,6 +150,7 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 	(
 		echo "Storing symbols..."
 		cd "${ANDROID_PRODUCT_OUT}"
+		cp obj/KERNEL/vmlinux symbols/
 		tar -cf ${ANDROID_BUILD_TOP}/${ARTIFACT_DIR}/symbols.tar symbols
 		mkdir -p ${ANDROID_BUILD_TOP}/${ARTIFACT_DIR}/images
 		echo "Storing flashable images..."
