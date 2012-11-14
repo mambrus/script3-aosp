@@ -80,7 +80,6 @@ function build() {
 source s3.ebasename.sh
 if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 	#Not sourced, do something with this.
-	set -e
 
 	if [ "X${ANDROID_PRODUCT_OUT}" == "X" ] || \
 	   [ $(basename $(echo $ANDROID_PRODUCT_OUT)) == "generic" ]; then
@@ -101,6 +100,7 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 		exit 3
 	)
 
+	set -e
 	set -u
 
 	TS=$(date '+%y%m%d_%H%M%S')
