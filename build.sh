@@ -100,7 +100,7 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 		exit 3
 	)
 
-	set -e
+	#set -e
 	set -u
 
 	TS=$(date '+%y%m%d_%H%M%S')
