@@ -71,15 +71,34 @@ EOF
 if [ -z $BUILD_SH ]; then
 
 BUILD_SH="build.sh"
+BUILD_SH_MAKE_RC=0
 
 function build() {
-	make "$@"
+	echo -n "========================================"
+	echo    "========================================"
+	echo "Starting build:"
+	echo "make "$@" ${EXTRA_MAKE_CMDLINE}"
+	echo -n "========================================"
+	echo    "========================================"
+	make "$@" ${EXTRA_MAKE_CMDLINE}
+	
+	#We need to pass exit-code differently as this executes in a subshell
+	BUILD_SH_MAKE_RC=$?
+	if [ ! ${BUILD_SH_MAKE_RC} -eq 0 ]; then
+		echo "Error: Build failed [${BUILD_SH_MAKE_RC}]"
+		date
+		exit 3
+	fi
+	return ${BUILD_SH_MAKE_RC}
 }
 
 
 source s3.ebasename.sh
 if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 	#Not sourced, do something with this.
+	
+	BUILD_SH_INFO=${BUILD_SH}
+	source .aosp.ui..build.sh
 
 	if [ "X${ANDROID_PRODUCT_OUT}" == "X" ] || \
 	   [ $(basename $(echo $ANDROID_PRODUCT_OUT)) == "generic" ]; then
@@ -106,9 +125,13 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 	TS=$(date '+%y%m%d_%H%M%S')
 	GRCAT_FILE="$( ebasename $0 )_${TS}"
 	ABN=${TARGET_PRODUCT}_$(hostname)_${TS}
-	ARTIFACT_DIR="build_artifacts/${ABN}"
+	ARTIFACT_DIR="${ARTIFACT_MAIN_DIR}/${ABN}"
 	NPROPS=$(grep processor /proc/cpuinfo | wc -l)
 	NJ=$(( NPROPS + (NPROPS/2) ))
+
+	if [ ! -d ${ARTIFACT_MAIN_DIR} ]; then
+		mkdir ${ARTIFACT_MAIN_DIR}
+	fi
 
 	which grcat > /dev/null && HAS_GRCAT="yes"
 	if [ ! -d "${ARTIFACT_DIR}" ]; then
@@ -119,24 +142,28 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 
 	if [ "X${HAS_GRCAT}" == "Xyes" ]; then
 		print_build_crcat_conf > "${HOME}/.grc/${GRCAT_FILE}"
-		(build "-j${NJ}" "$@" 2>&1 ) | \
+		( build "-j${NJ}" "$@" 2>&1 ) | \
 			tee ${ARTIFACT_DIR}/buildlog | \
 			grcat "${GRCAT_FILE}" \
-		&& (
-			echo -n "Build finished: "
+		|| (
+			echo "Error: Build failed"
 			date
-			echo
+			exit 3
 		)
+
 		rm -f "${HOME}/.grc/${GRCAT_FILE}"
 	else
-		(build "-j${NJ}" "$@" 2>&1 ) | \
+		( build "-j${NJ}" "$@" 2>&1 ) | \
 			tee ${ARTIFACT_DIR}/buildlog \
-		&& (
-			echo -n "Build finished: "
+		|| (
+			echo "Error: Build failed"
 			date
-			echo
+			exit 3
 		)
 	fi
+	echo -n "Build finished: "
+	date
+	echo
 
 	# This part is made to surpress symbols and img copying into artifacts
 	# It's designed using environment variable to avoid messing with
@@ -159,12 +186,12 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 		set -e
 	)
 	(
-		echo "Compressing into filename build_artifacts/${ABN}.tar.gz..."
-		cd build_artifacts
+		echo "Compressing into filename ${ARTIFACT_MAIN_DIR}/${ABN}.tar.gz..."
+		cd ${ARTIFACT_MAIN_DIR}
 		tar -czf ${ABN}.tar.gz ${ABN}/ 
 	)
-	echo "Cleaning up [build_artifacts/${ABN}]..."
-	rm -rf build_artifacts/${ABN}
+	echo "Cleaning up [${ARTIFACT_MAIN_DIR}/${ABN}]..."
+	rm -rf ${ARTIFACT_MAIN_DIR}/${ABN}
 	echo "All done!"
 
 	exit $?
