@@ -143,13 +143,9 @@ function tmpname_flags_init() {
 
 		esac
 	done
-	#Don't not adjust positional parameter scanning if sourced
-	#Do that when we know we're not sourced
 	shift $(($OPTIND - 1))
 
 	tmpname_vars_init
-	#echo "$(getvar VAR_FULL_TMPNAME_BASE)"
-	#exit 0
 }
 
 
