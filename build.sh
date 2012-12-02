@@ -185,13 +185,16 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 		cp -dp * ${ANDROID_BUILD_TOP}/${ARTIFACT_DIR}/images 2>/dev/null
 		set -e
 	)
-	(
-		echo "Compressing into filename ${ARTIFACT_MAIN_DIR}/${ABN}.tar.gz..."
-		cd ${ARTIFACT_MAIN_DIR}
-		tar -czf ${ABN}.tar.gz ${ABN}/
-	)
-	echo "Cleaning up [${ARTIFACT_MAIN_DIR}/${ABN}]..."
-	rm -rf ${ARTIFACT_MAIN_DIR}/${ABN}
+	if [ "X${SURPRESS_COMPRESS_AND_TIDY}" == "Xno" ]; then
+		(
+			echo "Compressing into filename ${ARTIFACT_MAIN_DIR}/${ABN}.tar.gz..."
+			cd ${ARTIFACT_MAIN_DIR}
+			tar -czf ${ABN}.tar.gz ${ABN}/
+		)
+
+		echo "Cleaning up [${ARTIFACT_MAIN_DIR}/${ABN}]..."
+		rm -rf ${ARTIFACT_MAIN_DIR}/${ABN}
+	fi
 	echo "All done!"
 
 	exit $?

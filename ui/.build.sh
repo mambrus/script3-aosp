@@ -45,7 +45,7 @@ Example:
 
 EOF
 }
-	while getopts xa:Vh OPTION; do
+	while getopts xa:zVh OPTION; do
 		case $OPTION in
 		h)
 			clear
@@ -58,11 +58,12 @@ EOF
 		a)
 			ARTIFACT_MAIN_DIR=$OPTARG
 			;;
+		z)
+			SURPRESS_COMPRESS_AND_TIDY="yes"
+			;;
 		V)
 			EXTRA_MAKE_CMDLINE="${EXTRA_MAKE_CMDLINE} showcommands"
 			;;
-# Note, this section is omitted on purpose. It needs to be to be able to pass
-# flags to make
 		?)
 			echo "Syntax error:" 1>&2
 			print_build_help $0 1>&2
@@ -74,6 +75,8 @@ EOF
 	shift $(($OPTIND - 1))
 
 	ARTIFACT_MAIN_DIR=${ARTIFACT_MAIN_DIR-"build_artifacts"}
+	AOSP_BUILD_SURPRESS_FULL=${AOSP_BUILD_SURPRESS_FULL-"no"}
+	SURPRESS_COMPRESS_AND_TIDY=${SURPRESS_COMPRESS_AND_TIDY-"build_artifacts"}
 
 	IS_ATTY="yes"
 	tty -s ||  IS_ATTY="no"
