@@ -10,7 +10,7 @@ LINK_MYSYMS_SH="link_mysyms.sh"
 # symbols
 function link_mysyms() {
     source ~/.android-helpers/build-config && \
-    	ln -sf $(landroid)/out/target/product/${BUILD_RTARGET}/symbols mysyms 
+    	ln -sf $(landroid)/out/target/product/${BUILD_RTARGET}/symbols mysyms
 }
 
 source s3.ebasename.sh

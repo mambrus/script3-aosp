@@ -8,7 +8,7 @@
 # =========
 # * Produce colorized output if possible (requires grcat installed to
 #     colorize but is tolerant not to require it)
-# * Makes a static manifest snapshot so that each build can be exactly 
+# * Makes a static manifest snapshot so that each build can be exactly
 #     reproduced from source)
 # * Figures out the best -j make-flag for your host.
 # *  Yet: Accepts all make arguments that Android build system would
@@ -81,7 +81,7 @@ function build() {
 	echo -n "========================================"
 	echo    "========================================"
 	make "$@" ${EXTRA_MAKE_CMDLINE}
-	
+
 	#We need to pass exit-code differently as this executes in a subshell
 	BUILD_SH_MAKE_RC=$?
 	if [ ! ${BUILD_SH_MAKE_RC} -eq 0 ]; then
@@ -96,7 +96,7 @@ function build() {
 source s3.ebasename.sh
 if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 	#Not sourced, do something with this.
-	
+
 	BUILD_SH_INFO=${BUILD_SH}
 	source .aosp.ui..build.sh
 
@@ -188,7 +188,7 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 	(
 		echo "Compressing into filename ${ARTIFACT_MAIN_DIR}/${ABN}.tar.gz..."
 		cd ${ARTIFACT_MAIN_DIR}
-		tar -czf ${ABN}.tar.gz ${ABN}/ 
+		tar -czf ${ABN}.tar.gz ${ABN}/
 	)
 	echo "Cleaning up [${ARTIFACT_MAIN_DIR}/${ABN}]..."
 	rm -rf ${ARTIFACT_MAIN_DIR}/${ABN}

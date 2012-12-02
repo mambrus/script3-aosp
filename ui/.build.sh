@@ -11,7 +11,7 @@ other stuff for you like colorizing output & create packages with symbos and
 frozen manifests for you. It has only a limited set op options as most options
 must be reserved for make. These options are called special_options above.
 
-More info about the AOSP build-system: 
+More info about the AOSP build-system:
 http://elinux.org/Android_Build_System
 
 Environment variables:
@@ -32,14 +32,14 @@ Special options:
   -h		Shows this help. Only flag that overides make flags.
 
 Example:
-  $BUILD_SH_INFO -x 
+  $BUILD_SH_INFO -x
   # Build with 'showcommands'
 
   $BUILD_SH_INFO -x -a mybuilds -- -w kernel libdir=mydir
   # Builds the AOSP build-target "kernel" printing directories as we go and
   # assigning the environment variable libdir, which becomes a make variable, the
   # value "mydir".
-  
+
   $BUILD_SH_INFO OUT_DIR=new_out
 
 

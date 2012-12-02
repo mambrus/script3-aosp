@@ -23,7 +23,7 @@ function attach() {
 
 	#adb root; adb remount;
 	adb forward "tcp:$PORT" "tcp:$PORT";
-	
+
 	#adb shell "gdbserver :$PORT --attach $PID"
 	adb shell "semc_gdbserver :$PORT --attach $PID"
 }

@@ -16,7 +16,7 @@ adb wait-for-device
 	  echo "==============================================="
 	  exit 1
 	fi
-  done 
+  done
 
 
 
