@@ -1,4 +1,4 @@
-# UI part of grit.build.sh
+# UI part of rg.build.sh
 # This is not even a script, stupid and can't exist alone. It is purely
 # ment for beeing included.
 
