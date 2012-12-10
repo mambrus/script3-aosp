@@ -74,6 +74,7 @@ BUILD_SH="build.sh"
 BUILD_SH_MAKE_RC=0
 
 function build() {
+	EXTRA_MAKE_CMDLINE=${EXTRA_MAKE_CMDLINE-""}
 	echo -n "========================================"
 	echo    "========================================"
 	echo "Starting build:"
