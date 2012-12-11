@@ -5,6 +5,7 @@
 #some defaults
 THERMLIST_SHELL_CMD="adb shell"
 THERMLIST_PERIOD="500"
+THERMLIST_DELIM=';'
 
 function print_thermlist_help() {
 	clear
@@ -24,10 +25,11 @@ to run on target. Just copy the script to target and use the -c option to avoid
 using [${THERMLIST_SHELL_CMD}].
 
 Options:
-  -c        Shell command. Default is [${THERMLIST_SHELL_CMD}].
+  -c <cmd>  Shell command. Default is [${THERMLIST_SHELL_CMD}].
             Note that this can be used to reach local host (sh) or a specific
             Android target.
-  -t        Period-time in milliseconds. Default is [${THERMLIST_PERIOD}]ms
+  -t <ms>   Period-time in milliseconds. Default is [${THERMLIST_PERIOD}]ms
+  -d <c>    Delimiter. Default is [${THERMLIST_DELIM}]
   -h        This help
 
 Example:
@@ -39,7 +41,7 @@ Example:
 
 EOF
 }
-	while getopts hc:t: OPTION; do
+	while getopts hc:t:d: OPTION; do
 		case $OPTION in
 		h)
 			print_thermlist_help $0
@@ -50,6 +52,9 @@ EOF
 			;;
 		t)
 			PERIOD=$OPTARG
+			;;
+		d)
+			DELIM=$OPTARG
 			;;
 		?)
 			echo "Syntax error:" 1>&2
@@ -63,9 +68,11 @@ EOF
 
 	SHELL_CMD=${SHELL_CMD-"${THERMLIST_SHELL_CMD}"}
 	PERIOD=${PERIOD-"${THERMLIST_PERIOD}"}
+	DELIM=${DELIM-"${THERMLIST_DELIM}"}
 
 	unset THERMLIST_SHELL_CMD
 	unset THERMLIST_PERIOD
+	unset THERMLIST_DELIM
 
 	if [ "X$(which usleep)" == "X" ]; then
 		echo "Command not found [msleep/usleep]:" 1>&2

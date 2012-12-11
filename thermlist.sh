@@ -17,7 +17,7 @@ function thermlist() {
 			sed -e 's/\x0d/\n/g')
 		for T in $THS
 		do
-			echo -n "$T;"
+			echo -n "$T${DELIM}"
 		done
 		echo
 		msleep ${PERIOD}
