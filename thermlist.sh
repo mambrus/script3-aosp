@@ -58,6 +58,20 @@ if [ "$THERMLIST_SH" == $( ebasename $0 ) ]; then
 		sed -e 's/\x0d/\n/g'
 	)
 
+	#Print legend
+	#adb shell cat /sys/class/thermal/thermal_zone1/type
+	NAMES=$(
+		bash -c "${SHELL_CMD} cat /sys/class/thermal/thermal_zone*/type" | \
+		sed -e 's/\x1b.\x4b//g' | \
+		sed -e 's/\x0d/\n/g')
+	for N in ${NAMES}
+	do
+		echo -n "$N${DELIM}" 1>&2
+		#echo -n "$N${DELIM}"
+	done
+	echo 1>&2
+	#echo
+
 	#Pass as one argument
 	thermlist "${TZS}"
 	RC=$?
