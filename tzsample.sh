@@ -4,12 +4,12 @@
 # 2012-12-10
 
 
-if [ -z $THERMLIST_SH ]; then
+if [ -z $TZSAMPLE_SH ]; then
 
-THERMLIST_SH="thermlist.sh"
+TZSAMPLE_SH="tzsample.sh"
 
 
-function thermlist() {
+function tzsample() {
 	while true; do
 		THS=$(
 			bash -c "${SHELL_CMD} cat /sys/class/thermal/thermal_zone*/temp" | \
@@ -25,7 +25,7 @@ function thermlist() {
 }
 
 #Prefered way, but too slow
-function thermlist_alt1() {
+function tzsample_alt1() {
 	while true; do
 
 		for T in $1; do
@@ -42,14 +42,14 @@ function thermlist_alt1() {
 }
 
 source s3.ebasename.sh
-if [ "$THERMLIST_SH" == $( ebasename $0 ) ]; then
+if [ "$TZSAMPLE_SH" == $( ebasename $0 ) ]; then
 	#Not sourced, do something with this.
 
-	THERMLIST_SH_INFO=${THERMLIST_SH}
-	source .aosp.ui..thermlist.sh
+	TZSAMPLE_SH_INFO=${TZSAMPLE_SH}
+	source .aosp.ui..tzsample.sh
 	source futil.find.sh
 
-	#thermlist "$@"
+	#tzsample "$@"
 
 	#detect available thermal zones:
 	TZS=$(
@@ -73,7 +73,7 @@ if [ "$THERMLIST_SH" == $( ebasename $0 ) ]; then
 	#echo
 
 	#Pass as one argument
-	thermlist "${TZS}"
+	tzsample "${TZS}"
 	RC=$?
 
 	cd ${OLD_PATH}
