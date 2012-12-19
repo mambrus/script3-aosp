@@ -1,4 +1,5 @@
 build.sh
+fixreply.sh
 landroid.sh
 link_mysyms.sh
 tzplots.sh

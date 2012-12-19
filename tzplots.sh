@@ -8,6 +8,7 @@ if [ -z $TZPLOTS_SH ]; then
 TZPLOTS_SH="tzplots.sh"
 
 function tzplots() {
+	source aosp.fixreply.sh
 	source futil.tmpname.sh
 	tmpname_flags_init "-a"
 
@@ -17,8 +18,7 @@ function tzplots() {
 
 	local NCPU=$(
 		bash -c "${SHELL_CMD} cat \"/proc/cpuinfo\"" | \
-		sed -e 's/\x1b.\x4b//g' | \
-		sed -e 's/\x0d/\n/g' | \
+		fixreply | \
 		grep -i bogomips | \
 		wc -l
 	)
@@ -52,14 +52,12 @@ function tzplots() {
 		#which is always available.
 		local CPU_PATH="/sys/devices/system/cpu"
 		local FRQ_MIN=$(
-			bash -c "${SHELL_CMD} \"cat ${CPU_PATH}/cpu0/cpufreq/scaling_min_freq\"" | \
-			sed -e 's/\x1b.\x4b//g' | \
-			sed -e 's/\x0d/\n/g')
+			bash -c "${SHELL_CMD} \"cat ${CPU_PATH}/cpu0/cpufreq/cpuinfo_min_freq\"" | \
+			fixreply )
 
 		local FRQ_MAX=$(
-			bash -c "${SHELL_CMD} \"cat ${CPU_PATH}/cpu0/cpufreq/scaling_max_freq\"" | \
-			sed -e 's/\x1b.\x4b//g' | \
-			sed -e 's/\x0d/\n/g')
+			bash -c "${SHELL_CMD} \"cat ${CPU_PATH}/cpu0/cpufreq/cpuinfo_max_freq\"" | \
+			fixreply )
 
 		(( FRQ_MIN /= 1000 ))
 		(( FRQ_MAX /= 1000 ))
@@ -69,7 +67,7 @@ function tzplots() {
 	fi
 
     if [ "X${DEBUG}" == "Xyes" ];then
-		xterm -e /bin/bash -l -c "tail -f $(tmpname samples)" &
+		xterm -e /bin/bash -c "tail -f $(tmpname samples)" &
 
 		echo "Will execute:"
 		echo "aosp.tzsample.sh ${FLG} -T${XOFFS_SCS} -lno | \

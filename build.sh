@@ -85,6 +85,9 @@ function build() {
 
 	#We need to pass exit-code differently as this executes in a subshell
 	BUILD_SH_MAKE_RC=$?
+
+	#Push the result in tempfile to workaround pipe when used with grc.
+	echo ${BUILD_SH_MAKE_RC} > $(tmpname rc)
 	if [ ! ${BUILD_SH_MAKE_RC} -eq 0 ]; then
 		echo "Error: Build failed [${BUILD_SH_MAKE_RC}]"
 		date
@@ -100,6 +103,8 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 
 	BUILD_SH_INFO=${BUILD_SH}
 	source .aosp.ui..build.sh
+	source futil.tmpname.sh
+	tmpname_flags_init "-a"
 
 	if [ "X${ANDROID_PRODUCT_OUT}" == "X" ] || \
 	   [ $(basename $(echo $ANDROID_PRODUCT_OUT)) == "generic" ]; then
@@ -164,7 +169,18 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 	fi
 	echo -n "Build finished: "
 	date
-	echo
+	LAST_MAKE_RC=$(tail -n1 $(tmpname rc))
+	if [ "X${LAST_MAKE_RC}" != "X0" ]; then
+		echo -n "########################################"
+		echo    "########################################"
+		echo "Error: Build failed!" 1>&2
+		echo -n "Please inspect logfile in [${ARTIFACT_DIR}/buildlog] "
+		echo    "for further details"
+		echo -n "########################################"
+		echo    "########################################"
+		exit 1
+	fi
+	tmpname_cleanup
 
 	# This part is made to surpress symbols and img copying into artifacts
 	# It's designed using environment variable to avoid messing with

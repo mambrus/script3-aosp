@@ -14,6 +14,7 @@ TZSAMPLE_SH="tzsample.sh"
 
 
 function tzsample() {
+	source aosp.fixreply.sh
 	source time.epoch.sh
 	source time.tdiff.sh
 	source time.tadd.sh
@@ -26,8 +27,7 @@ function tzsample() {
 	local TS_LAST=${TS_START}
 	local NCPU=$(
 		bash -c "${SHELL_CMD} cat \"/proc/cpuinfo\"" | \
-		sed -e 's/\x1b.\x4b//g' | \
-		sed -e 's/\x0d/\n/g' | \
+		fixreply | \
 		grep -i bogomips | \
 		wc -l
 	)
@@ -38,13 +38,11 @@ function tzsample() {
 		#which is always available.
 		local FRQ_MIN=$(
 			bash -c "${SHELL_CMD} \"cat ${CPU_PATH}/cpu0/cpufreq/scaling_min_freq\"" | \
-			sed -e 's/\x1b.\x4b//g' | \
-			sed -e 's/\x0d/\n/g')
+			fixreply )
 
 		local FRQ_MAX=$(
 			bash -c "${SHELL_CMD} \"cat ${CPU_PATH}/cpu0/cpufreq/scaling_max_freq\"" | \
-			sed -e 's/\x1b.\x4b//g' | \
-			sed -e 's/\x0d/\n/g')
+			fixreply )
 	fi
 
 
@@ -56,13 +54,11 @@ function tzsample() {
 		if [ "X${CPUFREQ}" != "Xno" ]; then
 			CFRQS=$(
 				bash -c "${SHELL_CMD} \"cat ${CFRQ_PATT}\"" | \
-				sed -e 's/\x1b.\x4b//g' | \
-				sed -e 's/\x0d/\n/g')
+				fixreply )
 		fi
 		THS=$(
 			bash -c "${SHELL_CMD} \"cat ${TZ_PATT}\"" | \
-			sed -e 's/\x1b.\x4b//g' | \
-			sed -e 's/\x0d/\n/g')
+			fixreply )
 
 		TS_LAST=${TS_NOW}
 		TS_NOW=$(epoch)
@@ -136,15 +132,14 @@ if [ "$TZSAMPLE_SH" == $( ebasename $0 ) ]; then
 	TZSAMPLE_SH_INFO=${TZSAMPLE_SH}
 	source .aosp.ui..tzsample.sh
 	source futil.find.sh
+	source aosp.fixreply.sh
 
 	#tzsample "$@"
 
 	#detect available thermal zones:
 	TZS=$(
 		bash -c "${SHELL_CMD} echo /sys/class/thermal/thermal_zone*/temp" | \
-		sed -e 's/\x1b.\x4b//g' | \
-		sed -e 's/\x0d/\n/g'
-	)
+		fixreply )
 
 	#Print legend
 	if [ "X${LEGEND}" == "Xyes" ]; then
@@ -154,8 +149,7 @@ if [ "$TZSAMPLE_SH" == $( ebasename $0 ) ]; then
 		if [ "X${CPUFREQ}" != "Xno" ]; then
 			NCPU=$(
 				bash -c "${SHELL_CMD} cat \"/proc/cpuinfo\"" | \
-				sed -e 's/\x1b.\x4b//g' | \
-				sed -e 's/\x0d/\n/g' | \
+				fixreply | \
 				grep -i bogomips | \
 				wc -l
 			)
@@ -166,8 +160,7 @@ if [ "$TZSAMPLE_SH" == $( ebasename $0 ) ]; then
 
 		NAMES=$(
 			bash -c "${SHELL_CMD} cat \"${TZ_DIR}/thermal_zone*/type\"" | \
-			sed -e 's/\x1b.\x4b//g' | \
-			sed -e 's/\x0d/\n/g')
+			fixreply )
 		for N in ${NAMES}; do
 			echo -n "$N${DELIM}"
 		done
