@@ -20,7 +20,7 @@ Example:
 
 EOF
 }
-	while getopts p:df:x:t:w:Fc:h OPTION; do
+	while getopts h OPTION; do
 		case $OPTION in
 		h)
 			print_fixreply_help $0

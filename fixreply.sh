@@ -3,9 +3,9 @@
 # Author: Michael Ambrus (ambrmi09@gmail.com)
 # 2012-12-18
 
-if [ -z $FIXREPLYS_SH ]; then
+if [ -z $FIXREPLY_SH ]; then
 
-FIXREPLYS_SH="fixreply.sh"
+FIXREPLY_SH="fixreply.sh"
 
 function fixreply() {
 		cat -- | \
@@ -14,10 +14,10 @@ function fixreply() {
 }
 
 source s3.ebasename.sh
-if [ "$FIXREPLYS_SH" == $( ebasename $0 ) ]; then
+if [ "$FIXREPLY_SH" == $( ebasename $0 ) ]; then
 	#Not sourced, do something with this.
 
-	FIXREPLYS_SH_INFO=${TZPLOTS_SH}
+	FIXREPLY_SH_INFO=${FIXREPLY_SH}
 	source .aosp.ui..fixreply.sh
 
 	fixreply "$@"
