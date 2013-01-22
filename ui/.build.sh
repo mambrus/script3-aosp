@@ -2,8 +2,10 @@
 # This is not even a script, stupid and can't exist alone. It is purely
 # ment for beeing included.
 
+DEF_ARTIFACT_DIR="./build_artifacts"
+
 function print_build_help() {
-			cat <<EOF
+	cat <<EOF
 Usage: $BUILD_SH_INFO [special_options] [make_options] [targets] [env_var]
 
 This script is used for building AOSP sources. It calls make, but also does
@@ -23,13 +25,17 @@ command-line. These *must* have an assignement operator, or they will be treated
 as targets.
 
 Special options:
-  -x		Ignore to tar your finished output
-  -a <dir>	Artifact directory.
-  -V		Verbose. I.e. showcommands is passed to make which is a special target
-  		to the AOSP build system
-  --		Stop parsing flags for this script. Everything to the right
-  		belongs to make.
-  -h		Shows this help. Only flag that overides make flags.
+  -x        Ignore to tar your finished output
+  -a <dir>  Artifact directory. Default dir is [${DEF_ARTIFACT_DIR}]
+  -V        Verbose. I.e. showcommands is passed to make which is a special target
+            to the AOSP build system.
+  -j <nr>   Same as the -j flag in gmake. Used to override the automatically
+            calculated optimal value and must be used here (i.e. shouldn't be
+            passed as a parameter to make or make vill get the same flag
+            twice)
+  --        Stop parsing flags for this script. Everything to the right
+            belongs to make.
+  -h        Shows this help. Only flag that overides make flags.
 
 Example:
   $BUILD_SH_INFO -x
@@ -45,7 +51,7 @@ Example:
 
 EOF
 }
-	while getopts xa:zVh OPTION; do
+	while getopts xa:zVhj: OPTION; do
 		case $OPTION in
 		h)
 			clear
@@ -57,6 +63,9 @@ EOF
 			;;
 		a)
 			ARTIFACT_MAIN_DIR=$OPTARG
+			;;
+		j)
+			NJ=$OPTARG
 			;;
 		z)
 			SURPRESS_COMPRESS_AND_TIDY="yes"
@@ -74,13 +83,16 @@ EOF
 	done
 	shift $(($OPTIND - 1))
 
-	ARTIFACT_MAIN_DIR=${ARTIFACT_MAIN_DIR-"build_artifacts"}
+	ARTIFACT_MAIN_DIR=${ARTIFACT_MAIN_DIR-${DEF_ARTIFACT_DIR}}
 	AOSP_BUILD_SURPRESS_FULL=${AOSP_BUILD_SURPRESS_FULL-"no"}
 	SURPRESS_COMPRESS_AND_TIDY=${SURPRESS_COMPRESS_AND_TIDY-"build_artifacts"}
+	NJ=${NJ-""}
 
 	IS_ATTY="yes"
 	tty -s ||  IS_ATTY="no"
 	if [ "X${IS_ATTY}" == "Xno" ]; then
 		INPUT_FILE="-"
 	fi
+
+	unset DEF_ARTIFACT_DIR
 

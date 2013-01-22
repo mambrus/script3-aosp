@@ -133,7 +133,11 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 	ABN=${TARGET_PRODUCT}_$(hostname)_${TS}
 	ARTIFACT_DIR="${ARTIFACT_MAIN_DIR}/${ABN}"
 	NPROPS=$(grep processor /proc/cpuinfo | wc -l)
-	NJ=$(( NPROPS + (NPROPS/2) ))
+
+	#In -j flag is not overridden, calculate a good value
+	if [ "X${NJ}" == "X" ]; then
+		NJ=$(( NPROPS + (NPROPS/2) ))
+	fi
 
 	if [ ! -d ${ARTIFACT_MAIN_DIR} ]; then
 		mkdir ${ARTIFACT_MAIN_DIR}
