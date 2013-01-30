@@ -7,11 +7,14 @@ if [ -z $FLIST_SH ]; then
 
 FLIST_SH="flist.sh"
 
+# This solution takes care of the case where directories and files comes
+# and goes. This way, *all* files are expanded simultaniously.
+
 function flist() {
 	source aosp.fixreply.sh
-	source futil.tmpname.sh
-	tmpname_flags_init "-a"
-	local APPEND_STR=""
+	local APPEND_STR="${START_DIR}"
+	local -a APPEND_ARR
+	local T_DIR=$(echo ${START_DIR} | sed -e 's/\//\\\//g')
 
 	if [ "X$(echo ${SHELL_CMD} | grep adb)" != "X" ]; then
 		adb wait-for-device
@@ -19,12 +22,13 @@ function flist() {
 
 	for (( i=0; i<$DIR_DEPTH; i++ )); do
 		APPEND_STR="${APPEND_STR}/*"
-		${SHELL_CMD} echo "${START_DIR}${APPEND_STR}" | fixreply >> $(tmpname)
+		APPEND_ARR[i]=${APPEND_STR}
 	done
-	
-	local T_DIR=$(echo ${START_DIR} | sed -e 's/\//\\\//g')
-	sed -e 's/ /\n/g' < $(tmpname) | sed -n "/^${T_DIR}/p"
-	tmpname_cleanup
+
+	${SHELL_CMD} echo "${APPEND_ARR[@]}" | \
+		fixreply | \
+		sed -e 's/ /\n/g' | \
+		sed -n "/^${T_DIR}/p"
 }
 
 source s3.ebasename.sh
