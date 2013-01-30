@@ -1,4 +1,5 @@
 .build.sh
 .fixreply.sh
+.flist.sh
 .tzplots.sh
 .tzsample.sh
