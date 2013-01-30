@@ -116,10 +116,6 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 		exit 1
 	fi
 
-	if [ -z ${AOSP_BUILD_SURPRESS_FULL} ]; then
-		AOSP_BUILD_SURPRESS_FULL="no"
-	fi
-
 	ls .repo/manifest.xml || (
 		echo "Error: You're not standing in an Android root directory" 1>&2
 		exit 3
@@ -206,7 +202,7 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 		cp -dp * ${ANDROID_BUILD_TOP}/${ARTIFACT_DIR}/images 2>/dev/null
 		set -e
 	)
-	if [ "X${SURPRESS_COMPRESS_AND_TIDY}" == "Xno" ]; then
+	if [ "X${SURPRESS_COMPRESS_AND_TIDY}" != "Xno" ]; then
 		(
 			echo "Compressing into filename ${ARTIFACT_MAIN_DIR}/${ABN}.tar.gz..."
 			cd ${ARTIFACT_MAIN_DIR}

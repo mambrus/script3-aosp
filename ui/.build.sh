@@ -29,6 +29,8 @@ Special options:
   -a <dir>  Artifact directory. Default dir is [${DEF_ARTIFACT_DIR}]
   -V        Verbose. I.e. showcommands is passed to make which is a special target
             to the AOSP build system.
+  -z        Compress binaries and symbols into one .tar.gz file and place in
+            artifact directory, see -a flag. Default is "no"
   -j <nr>   Same as the -j flag in gmake. Used to override the automatically
             calculated optimal value and must be used here (i.e. shouldn't be
             passed as a parameter to make or make vill get the same flag
@@ -85,7 +87,7 @@ EOF
 
 	ARTIFACT_MAIN_DIR=${ARTIFACT_MAIN_DIR-${DEF_ARTIFACT_DIR}}
 	AOSP_BUILD_SURPRESS_FULL=${AOSP_BUILD_SURPRESS_FULL-"no"}
-	SURPRESS_COMPRESS_AND_TIDY=${SURPRESS_COMPRESS_AND_TIDY-"build_artifacts"}
+	SURPRESS_COMPRESS_AND_TIDY=${SURPRESS_COMPRESS_AND_TIDY-"no"}
 	NJ=${NJ-""}
 
 	IS_ATTY="yes"
