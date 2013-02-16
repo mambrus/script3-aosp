@@ -103,7 +103,9 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 
 	BUILD_SH_INFO=${BUILD_SH}
 	source .aosp.ui..build.sh
+	source s3.user_response.sh
 	source futil.tmpname.sh
+
 	tmpname_flags_init "-a"
 
 	if [ "X${ANDROID_PRODUCT_OUT}" == "X" ] || \
@@ -125,6 +127,7 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 	set -u
 
 	TS=$(date '+%y%m%d_%H%M%S')
+	TSTART=$(date)
 	GRCAT_FILE="$( ebasename $0 )_${TS}"
 	ABN=${TARGET_PRODUCT}_$(hostname)_${TS}
 	ARTIFACT_DIR="${ARTIFACT_MAIN_DIR}/${ABN}"
@@ -167,8 +170,14 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 			exit 3
 		)
 	fi
-	echo -n "Build finished: "
-	date
+	TSTOP=$(date)
+	echo "Build job stopped at: ${TSTOP}"
+	BT=$(time.tdiff.sh "${TSTART}" "${TSTOP}")
+	BT_H=$(echo "${BT} / 3600" | bc)
+	BT_M=$(echo "(${BT} % 3600) / 60" | bc)
+	BT_S=$(echo "(${BT} % 3600) % 60" | bc)
+	echo "Build-time: ${BT_H}:${BT_M}:${BT_S} (${BT}s)"
+
 	LAST_MAKE_RC=$(tail -n1 $(tmpname rc))
 	if [ "X${LAST_MAKE_RC}" != "X0" ]; then
 		echo -n "########################################"
@@ -180,7 +189,26 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 		echo    "########################################"
 		exit 1
 	fi
-	tmpname_cleanup
+	# Parse for more possible errors that top-level make doesn't return as
+	# error (which is an error in it's own b.t.w., but an error of the
+	# build-system)
+	ERRORS_IN_LOG=""
+
+	#Known strings could be put in array and iterated. TBD
+	ERRORS_IN_LOG="${ERRORS_IN_LOG} $(grep -n 'Error 1 (ignored)' ${ARTIFACT_DIR}/buildlog)"
+	if [ "X${ERRORS_IN_LOG}" != "X" ]; then
+		echo -n "########################################"
+		echo    "########################################"
+		echo "Build errors found in log:"
+		echo "${ERRORS_IN_LOG}"
+		echo -n "Please inspect logfile in [${ARTIFACT_DIR}/buildlog] "
+		echo    "for further details"
+		echo -n "########################################"
+		echo    "########################################"
+		set +u
+		ask_user_continue "Continue with storing build (i.e. ignore error)? (Y/n)" || exit 1
+		set -u
+	fi
 
 	# This part is made to surpress symbols and img copying into artifacts
 	# It's designed using environment variable to avoid messing with
