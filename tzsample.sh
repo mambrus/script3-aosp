@@ -12,6 +12,29 @@ if [ -z $TZSAMPLE_SH ]; then
 
 TZSAMPLE_SH="tzsample.sh"
 
+function aosp.dvfs_print() {
+	local DEVFS="/sys/kernel/debug/clock/dvfs"
+	local ANSWER=$(
+		bash -c "${SHELL_CMD} cat ${DEVFS}" | \
+			fixreply | \
+			grep "${1}" | \
+			awk '{print $2}'
+	)
+	if [ "X${ANSWER}" != "X" ]; then
+		echo -n "$(( ${ANSWER} / 1000000 ))${DELIM}"
+	else
+		echo -n "0"${DELIM}
+	fi
+
+}
+
+function aosp.gpufreq_print() {
+	 aosp.dvfs_print "3d"
+}
+
+function aosp.busfreq_print() {
+	 aosp.dvfs_print "emc"
+}
 
 function tzsample() {
 	source aosp.fixreply.sh
@@ -34,8 +57,9 @@ function tzsample() {
 
 	FREQ_FORMULA='$F / 1512 * 100'
 	if [ "X${CPUFREQ}" != "Xno" ]; then
-		#Detect min/max supported frequencies. Use CPU0 to detecit from
-		#which is always available.
+		# Detect min/max supported frequencies. Use CPU0 to conclude as
+		# CPU0 is always online (on an alive system i.e. otherwise it's
+		# rather pointless anyway).
 		local FRQ_MIN=$(
 			bash -c "${SHELL_CMD} \"cat ${CPU_PATH}/cpu0/cpufreq/scaling_min_freq\"" | \
 			fixreply )
@@ -97,6 +121,12 @@ function tzsample() {
 			done
 		fi
 
+		if [ "X${BUSFREQ_MAX}" != "X" ]; then
+			aosp.busfreq_print
+		fi
+		if [ "X${GPUCLK_MAX}" != "X" ]; then
+			aosp.gpufreq_print
+		fi
 
 		for T in $THS; do
 			if [ $T -lt 256 ]; then
@@ -120,7 +150,7 @@ function tzsample() {
 		if [ $SLEEP_T -gt 0 ]; then
 			msleep ${SLEEP_T}
 		else
-			echo "Can't compenste lag-error" 2>&1
+			echo "Can't compensate lag-error" 2>&1
 		fi
 	done
 }
@@ -156,6 +186,12 @@ if [ "$TZSAMPLE_SH" == $( ebasename $0 ) ]; then
 			for (( N=0;N<NCPU;N++ )); do
 				echo -n "freqCPU${N}${DELIM}"
 			done
+		fi
+		if [ "X${BUSFREQ_MAX}" != "X" ]; then
+			echo -n "freqBUS${DELIM}"
+		fi
+		if [ "X${GPUCLK_MAX}" != "X" ]; then
+			echo -n "freqGPU${DELIM}"
 		fi
 
 		NAMES=$(

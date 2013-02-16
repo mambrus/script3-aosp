@@ -11,7 +11,7 @@ TZSAMPLE_TZ_DIR='/sys/devices/virtual/thermal'
 
 function print_tzsample_help() {
 	clear
-			cat <<EOF
+	cat <<EOF
 Usage: $TZSAMPLE_SH_INFO [options]
 
 Prints /sys/class/thermal/thermal_zoneX/temp
@@ -29,7 +29,7 @@ using [${TZSAMPLE_SHELL_CMD}].
 Options. Defautls within []:
   -c <cmd>        Shell command [${TZSAMPLE_SHELL_CMD}]
                   Note that this can be used to reach local host (sh)
-				  or a specific Android target.
+                  or a specific Android target.
   -t <ms>         Sample-time [${TZSAMPLE_PERIOD}]ms
   -T <ofs>        Relative timestamp-offset in first column (seconds)
                   Value of offset is added to timestamp.
@@ -41,6 +41,16 @@ Options. Defautls within []:
   -L              Just print legend, then exit
   -F              Print multi-core CPU frequencies (kHz).
   -f              Print multi-core CPU frequencies (%)
+  -B <maxfrq>     Print memory-bus speed. Value <maxfrq> means two things:
+                  If 0: print values in kHz. 
+                  Any other value: Output is in % of maxvalue given
+                  Default is no memory-bus speed is printed as how/where is
+                  non-standard.
+  -G <maxfrq>     Print GPU-clock speed. Value <maxfrq> means two things:
+                  If 0: print values in kHz. 
+                  Any other value: Output is in % of maxvalue given
+                  Default is no memory-bus speed is printed as how/where is
+                  non-standard.
   -h              This help
 
 Example:
@@ -52,7 +62,7 @@ Example:
 
 EOF
 }
-	while getopts hc:t:T:d:s:l:Lm:Ff OPTION; do
+	while getopts hc:t:T:d:s:l:Lm:FB:G:f OPTION; do
 		case $OPTION in
 		h)
 			print_tzsample_help $0
@@ -79,6 +89,12 @@ EOF
 		f)
 			CPUFREQ='%'
 			;;
+		B)
+			BUSFREQ_MAX=$OPTARG
+			;;
+		G)
+			GPUCLK_MAX=$OPTARG
+			;;
 		l)
 			LEGEND=$OPTARG
 			;;
@@ -103,7 +119,11 @@ EOF
 	LEGEND=${LEGEND-"yes"}
 	DRYRUN=${DRYRUN-"no"}
 	XOFFSET=${XOFFSET-""}
-	CPUFREQ=${CPUFREQ-"yes"}
+	CPUFREQ=${CPUFREQ-"no"}
+	# Define but dont set GPUCLK_MAX BUSFREQ_MAX. I.e. don't print
+	# per default as where/how to get them varies.
+	BUSFREQ_MAX=${BUSFREQ_MAX-""}
+	GPUCLK_MAX=${GPUCLK_MAX-""}
 
 	unset TZSAMPLE_SHELL_CMD
 	unset TZSAMPLE_PERIOD

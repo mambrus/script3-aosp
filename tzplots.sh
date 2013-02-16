@@ -23,12 +23,15 @@ function tzplots() {
 		wc -l
 	)
 	local Y2_LEGEND_STR="--y2 0"
+
+##Add 2 more for bus and GPU-freq
+	(( NCPU += 2 ))
 	for (( n=1;n<NCPU;n++ )); do
 		Y2_LEGEND_STR="${Y2_LEGEND_STR},${n}"
 	done
 
 	local LEGEND=$(
-		aosp.tzsample.sh -F -L | \
+		aosp.tzsample.sh -F -G0 -B0 -L | \
 		sed -e 's/;/\n/g' | \
 		 awk '
 		 	BEGIN{
@@ -40,15 +43,16 @@ function tzplots() {
 		 head -n-1
 	)
 
-    if [ "X${FRQ_HZ}" == "Xyes" ];then
+	if [ "X${FRQ_HZ}" == "Xyes" ];then
 		local Y2LABEL="Hz(%)"
 		local FRQ_MIN=0
 		local FRQ_MAX=100
-		local FLG="-f"
+		#TBD - needs adding real maxfreqs for GPU and SYSbus
+		local FLG="-f -G600 -B792"
 	else
 		local Y2LABEL="MHz"
-		local FLG="-F"
-		#Detect min/max supported frequencies. Use CPU0 to detecit from
+		local FLG="-F -G0 -B0"
+		#Detect min/max supported frequencies. Use CPU0 to detec it from
 		#which is always available.
 		local CPU_PATH="/sys/devices/system/cpu"
 		local FRQ_MIN=$(
