@@ -147,7 +147,7 @@ if [ "$BUILD_SH" == $( ebasename $0 ) ]; then
 		mkdir -p "${ARTIFACT_DIR}"
 	fi
 
-	rg.cstat_manifest.sh "${ARTIFACT_DIR}/manifest.xml"
+	rg.static_manifest.sh "${ARTIFACT_DIR}/manifest.xml"
 
 	if [ "X${HAS_GRCAT}" == "Xyes" ]; then
 		print_build_crcat_conf > "${HOME}/.grc/${GRCAT_FILE}"
